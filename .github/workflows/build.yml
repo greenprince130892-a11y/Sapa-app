@@ -1,0 +1,36 @@
+name: Build Sapa Android APK
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Ekstrak dan Siapkan Aplikasi Sapa
+        run: |
+          mkdir -p www
+          unzip -o sapa-web.zip -d www
+          if [ -d "www/sapa-web" ]; then mv www/sapa-web/* www/; fi
+          npm init -y
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npx cap init "Sapa" "com.sapa.app" --web-dir=www
+          npx cap add android
+          npx cap sync android
+      - name: Rakit APK Android
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Sapa-Android-APK
+          path: android/app/build/outputs/apk/debug/
