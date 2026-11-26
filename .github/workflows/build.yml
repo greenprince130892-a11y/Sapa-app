@@ -1,8 +1,5 @@
 name: Build Sapa Android APK
-on:
-  push:
-  workflow_dispatch:
-
+on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,102 +12,16 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
-      - name: Siapkan Aplikasi Sapa v3 OTP
-        run: |
+      - run: |
           mkdir -p www
-          unzip -o sapa-web.zip -d www
-          if [ -d "www/sapa-web" ]; then mv www/sapa-web/* www/; fi
-          cat << 'EOF' > www/index.html
-          <!DOCTYPE html>
-          <html lang="id">
-          <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-          <meta name="theme-color" content="#0B6E77">
-          <link rel="manifest" href="manifest.webmanifest">
-          <link rel="icon" href="icon.svg">
-          <title>Sapa</title>
-          <style>
-          :root{--bg:#F2F5F4;--sf:#FFFFFF;--ink:#14262B;--mute:#5C6E73;--line:#D9E2E0;--brand:#0B6E77;--on:#FFFFFF;--acc:#F5B83D;--ok:#16A34A;color-scheme:light}
-          @media (prefers-color-scheme:dark){:root{--bg:#0F1A1D;--sf:#172528;--ink:#E8F0EF;--mute:#93A8AB;--line:#263A3E;--brand:#3CB4BE;--on:#062226;--ok:#22C55E;color-scheme:dark}}
-          *{box-sizing:border-box}html,body{height:100%;margin:0}
-          body{background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-          h1{margin:0;letter-spacing:-.01em}
-          #app{max-width:520px;height:100%;margin:0 auto;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-          button,input,textarea{font:inherit;color:inherit}button{cursor:pointer}
-          .top{padding:14px 18px 8px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
-          .top h1{font-size:26px;font-weight:800}.top p{margin:2px 0 0;color:var(--mute);font-size:13px}
-          .chips{display:flex;gap:6px;padding:0 14px 6px}
-          .chip{border:1px solid var(--line);background:var(--sf);color:var(--mute);border-radius:99px;padding:5px 12px;font-size:13px;font-weight:600}
-          .chip.on{background:var(--brand);color:var(--on);border-color:var(--brand)}
-          .body{flex:1;overflow-y:auto;padding:4px 14px 14px}
-          .row{display:flex;gap:12px;align-items:center;background:var(--sf);border:1px solid var(--line);border-radius:16px;padding:12px;margin:8px 0;width:100%;text-align:left}
-          .av-wrap{position:relative;flex:none}
-          .av{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:19px;color:#fff}
-          .dot{position:absolute;right:1px;bottom:1px;width:12px;height:12px;border-radius:50%;background:var(--ok);border:2px solid var(--sf)}
-          .meta{flex:1;min-width:0}.meta b{display:block;font-size:15px}
-          .meta span{display:block;color:var(--mute);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-          .sub-meta{font-size:12px;color:var(--mute);margin-top:2px}
-          .wave{flex:none;background:rgba(11,110,119,.12);color:var(--brand);border:1px solid rgba(11,110,119,.3);border-radius:99px;padding:7px 12px;font-size:13px;font-weight:700}
-          .pill{flex:none;background:var(--brand);color:var(--on);border:0;border-radius:99px;padding:9px 18px;font-weight:700}
-          .tabs{display:flex;border-top:1px solid var(--line);background:var(--sf)}
-          .tabs button{flex:1;border:0;background:none;padding:9px 0 10px;color:var(--mute);font-weight:600;font-size:12px;border-top:3px solid transparent;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative}
-          .tabs button .ico{font-size:18px;line-height:1.1}
-          .tabs button[aria-current="true"]{color:var(--brand);border-top-color:var(--brand)}
-          .badge{position:absolute;top:7px;right:26%;width:9px;height:9px;border-radius:50%;background:#E11D48}
-          .note{background:var(--sf);border:1px dashed var(--line);border-radius:12px;padding:10px 12px;color:var(--mute);font-size:13px;margin:8px 0}
-          .empty{text-align:center;color:var(--mute);padding:48px 20px;font-size:14px}
-          .chat-h{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--sf);border-bottom:1px solid var(--line)}
-          .back{border:0;background:none;font-size:22px;padding:4px 8px}
-          .msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px}
-          .b{max-width:78%;padding:9px 13px;border-radius:18px;overflow-wrap:anywhere;font-size:15px}
-          .b time{display:block;font-size:11px;opacity:.7;margin-top:3px;text-align:right}
-          .me{align-self:flex-end;background:var(--brand);color:var(--on);border-bottom-right-radius:4px}
-          .th{align-self:flex-start;background:var(--sf);border:1px solid var(--line);border-bottom-left-radius:4px}
-          .send{display:flex;gap:8px;padding:10px;background:var(--sf);border-top:1px solid var(--line)}
-          .send input{flex:1;border:1px solid var(--line);background:var(--bg);border-radius:99px;padding:11px 16px;min-width:0}
-          .pcard{display:flex;align-items:center;gap:14px;background:var(--sf);border:1px solid var(--line);border-radius:16px;padding:14px;margin:6px 0 12px}
-          .form{padding:28px 20px;display:flex;flex-direction:column;gap:14px;justify-content:center;flex:1}
-          .form h1{font-size:40px;font-weight:800;line-height:1.05}
-          .form label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px}
-          .form label.ck{flex-direction:row;align-items:center;gap:10px;font-weight:400}
-          .form input,.form textarea{border:1px solid var(--line);background:var(--sf);border-radius:12px;padding:12px;font-weight:400}
-          .otp-in{font-size:24px;letter-spacing:8px;text-align:center;font-weight:700}
-          .form input[type=checkbox]{width:20px;height:20px;padding:0}
-          .big{background:var(--brand);color:var(--on);border:0;border-radius:12px;padding:14px;font-weight:700}
-          .ghost{background:none;border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--mute)}
-          .sm{padding:6px 10px;font-size:12px;border-radius:10px}
-          </style>
-          </head>
-          <body>
-          <div id="app"><div class="empty">Memuat…</div></div>
-          <script src="https://jsdelivr.net"></script>
-          <script>
-          var SB_URL="https://supabase.co",SB_KEY="sb_publishable_5bj_O0E3MAcUJp1tuqfBJQ_RTFIAL_X";
-          var app=document.getElementById("app"),sb=null,me=null,MP=null,P={},BL={},M=[],subbed=false,S={tab:"near",open:null,err:"",step:"email",email:"",onlyOn:false,unread:false};
-          function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
-          function hue(s){var h=0;s=String(s);for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return Math.abs(h)%360}
-          function isOn(t){return t&&(Date.now()-Date.parse(t))<300000}
-          function av(n,id,t){return '<div class="av-wrap"><div class="av" style="background:hsl('+hue(id)+' 45% 38%)">'+esc((n||"?").charAt(0).toUpperCase())+'</div>'+(isOn(t)?'<span class="dot"></span>':'')+'</div>'}
-          function ago(t){if(!t)return"baru bergabung";var m=Math.round((Date.now()-Date.parse(t))/60000);return m<5?"Online":m<60?m+" mnt lalu":m<1440?Math.round(m/60)+" jam lalu":Math.round(m/1440)+" hr lalu"}
-          function jam(t){if(!t)return"";var d=new Date(t);return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")}
-          function dist(a,b){if(!a||!b||a.lat==null||b.lat==null)return null;var r=Math.PI/180,dl=(b.lat-a.lat)*r,dn=(b.lng-a.lng)*r,x=Math.pow(Math.sin(dl/2),2)+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.pow(Math.sin(dn/2),2);return 12742*Math.asin(Math.sqrt(x))}
-          function fk(d){return d==null?"lokasi belum aktif":d<1.5?"≤ 1 km":d.toFixed(1).replace(".",",")+" km"}
-          function getLoc(){return new Promise(function(ok){if(!navigator.geolocation)return ok(null);var done=false,tm=setTimeout(function(){if(!done){done=true;ok(null)}},7000);navigator.geolocation.getCurrentPosition(function(p){if(done)return;done=true;clearTimeout(tm);ok({lat:Math.round(p.coords.latitude*100)/100,lng:Math.round(p.coords.longitude*100)/100})},function(){if(done)return;done=true;clearTimeout(tm);ok(null)},{timeout:6000})})}
-          function say(e){S.err=e;render()}
-          function other(x){return x.sender===me.id?x.recipient:x.sender}
-          function convo(p){return M.filter(function(x){return other(x)===p})}
-          async function boot(){
-            if(!window.supabase){app.innerHTML='<div class="empty">Periksa koneksi internet Anda.</div>';return}
-            sb=supabase.createClient(SB_URL,SB_KEY);
-            var r=await sb.auth.getSession();
-            if(r.data.session){me=r.data.session.user;await load()}else render();
-            sb.auth.onAuthStateChange(function(ev,ss){if(ev==="SIGNED_OUT"){me=null;MP=null;P={};M=[];subbed=false;render()}else if(ev==="SIGNED_IN"&&ss&&!me){me=ss.user;load()}});
-          }
-          async function load(){
-            var a=await sb.from("profiles").select("*").eq("id",me.id).maybeSingle();MP=a.data;
-            if(MP){sb.from("profiles").update({seen:new Date().toISOString()}).eq("id",me.id).then(function(){});await refresh();sub()}
-            render();
-          }
-          async function refresh(){
-            var r=await Promise.all([sb.from("profiles").select("*").limit(200),sb.from("blocks").select("blocked"),sb.from("messages").select("*").order("created",{ascending:false}).limit(500)]);
+          cp index.html www/index.html
+          npm init -y
+          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
+          npx cap init "Sapa" "com.sapa.app" --web-dir=www
+          npx cap add android
+          npx cap sync android
+          cd android && chmod +x gradlew && ./gradlew assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Sapa-Android-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
